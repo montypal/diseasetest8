@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epidemiology Master Quiz: 100 Questions</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #2980b9;
+            --accent: #16a085;
+            --bg: #ecf0f1;
+            --card: #ffffff;
+            --text: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 { color: var(--primary); margin: 0; font-size: 2.2rem; }
+        .subtitle { color: #7f8c8d; font-size: 1.1rem; margin-top: 10px; }
+
+        /* Progress Bar */
+        .progress-container {
+            background: #dfe6e9;
+            height: 12px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: -2px;
+            font-size: 10px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        /* Question Area */
+        .category-badge {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #34495e;
+        }
+
+        /* Options */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        @media (max-width: 600px) { .options-grid { grid-template-columns: 1fr; } }
+
+        .option-btn {
+            background: #fff;
+            border: 2px solid #bdc3c7;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            position: relative;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--secondary);
+            background: #f4faff;
+        }
+
+        .option-btn.selected {
+            border-color: var(--primary);
+            background: #eef2f5;
+        }
+
+        .option-btn.correct {
+            background-color: #d5f5e3 !important;
+            border-color: #27ae60 !important;
+            color: #0e6655;
+        }
+
+        .option-btn.wrong {
+            background-color: #fadbd8 !important;
+            border-color: #c0392b !important;
+            color: #7b241c;
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        /* Explanation / Feedback */
+        .feedback-box {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            border-left: 6px solid #ccc;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .feedback-box.success { border-color: #27ae60; background: #eafaf1; }
+        .feedback-box.error { border-color: #c0392b; background: #fdedec; }
+
+        /* Tables */
+        .calc-table {
+            width: 100%;
+            max-width: 500px;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .calc-table th, .calc-table td {
+            border: 1px solid #dcdcdc;
+            padding: 8px;
+            text-align: center;
+        }
+        .calc-table th { background: #f1f2f6; color: #555; }
+        .highlight { font-weight: bold; color: var(--secondary); }
+
+        /* Navigation */
+        .nav-area {
+            margin-top: 30px;
+            text-align: right;
+        }
+        .btn-next {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: none;
+        }
+        .btn-next:hover { background: #34495e; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Epidemiology Master Quiz</h1>
+        <div class="subtitle">100 Questions: Test your Disease Detective Skills</div>
+    </header>
+
+    <div class="progress-container">
+        <div class="progress-fill" id="progress-bar"></div>
+        <div class="progress-text" id="progress-text">Question 1 of 100</div>
+    </div>
+
+    <div id="quiz-content">
+        <div id="category-display" class="category-badge">Category</div>
+        <div id="question-text" class="question-text">Loading...</div>
+        
+        <div id="options-container" class="options-grid"></div>
+
+        <div id="feedback" class="feedback-box">
+            <h3 id="feedback-title" style="margin-top:0;"></h3>
+            <div id="feedback-body"></div>
+        </div>
+
+        <div class="nav-area">
+            <button id="next-btn" class="btn-next" onclick="nextQuestion()">Next Question &rarr;</button>
+        </div>
+    </div>
+    
+    <div id="results-screen" style="display:none; text-align:center;">
+        <h2 style="color:var(--secondary)">Quiz Complete!</h2>
+        <p style="font-size:1.2rem;">You have finished all 100 questions.</p>
+        <div style="font-size:3rem; font-weight:bold; margin:20px 0;" id="final-score"></div>
+        <button class="btn-next" style="display:inline-block;" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    /**
+     * EPIDEMIOLOGY QUESTION GENERATOR ENGINE
+     * Generates 100 unique questions on the fly to ensure variety and perfect math.
+     */
+
+    const NAMES = ["Dr. Grace", "Dr. Aarav", "Dr. Kangin", "Dr. Alyssa", "Dr. Maggie"];
+    const DISEASES = [
+        "TikTok Tics", "Zoom Fatigue", "Netflix Neuralgia", "Snapchat Syndrome", 
+        "Emoji Fever", "Hashtag Headache", "WiFi Wheeze", "Pixel Pox", 
+        "Influencer Influenza", "Scroll Thumb", "Selfie Strain", "Meme Measles",
+        "Stream Sneeze", "Data Dizziness", "Cloud Cough", "Gamer Gout",
+        "Login Lethargy", "Buffer Bloat", "Viral Vibes", "Filter Fatigue"
+    ];
+
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    // --- HELPER FUNCTIONS ---
+    function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function randItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    function round(num, decimals=2) { return Number(Math.round(num+'e'+decimals)+'e-'+decimals); }
+
+    // --- GENERATORS ---
+
+    // 1. Disease Association (RR / OR)
+    function generateAssocQuestion() {
+        const name = randItem(NAMES);
+        const disease = randItem(DISEASES);
+        
+        // Ensure numbers are reasonably clean
+        let a = randInt(20, 100); // Exposed + Sick
+        let b = randInt(100, 300); // Exposed + Healthy
+        let c = randInt(10, 50);  // Unexposed + Sick
+        let d = randInt(100, 300); // Unexposed + Healthy
+
+        const riskExposed = a / (a + b);
+        const riskUnexposed = c / (c + d);
+        const rr = round(riskExposed / riskUnexposed);
+        const or = round((a * d) / (b * c));
+
+        // Randomly ask for RR or OR
+        const type = Math.random() > 0.5 ? "RR" : "OR";
+        const answer = type === "RR" ? rr : or;
+        
+        const questionText = `<strong>${name}</strong> is investigating "${disease}". 
+            <br>Study Population:
+            <ul>
+                <li>Exposed Group: ${a+b} people (${a} sick, ${b} healthy)</li>
+                <li>Unexposed Group: ${c+d} people (${c} sick, ${d} healthy)</li>
+            </ul>
+            Calculate the <strong>${type === "RR" ? "Relative Risk (RR)" : "Odds Ratio (OR)"}</strong>.`;
+
+        // Generate Distractors
+        let distractors = new Set();
+        distractors.add(round(answer * 1.5));
+        distractors.add(round(answer / 2));
+        distractors.add(round(answer + 0.5));
+        distractors.add(round((a/(a+c))/(b/(b+d)))); // common mistake logic
+        
+        // Clean distractor set
+        let opts = Array.from(distractors).slice(0, 3);
+        while(opts.length < 3) opts.push(round(Math.random()*5));
+        
+        // Table HTML
+        const table = `
+            <table class="calc-table">
+                <tr><th></th><th>Sick (+)</th><th>Healthy (-)</th></tr>
+                <tr><td>Exposed</td><td>${a}</td><td>${b}</td></tr>
+                <tr><td>Unexposed</td><td>${c}</td><td>${d}</td></tr>
+            </table>`;
+
+        const explanation = `
+            ${table}
+            <p><strong>Step 1: Identify Values</strong><br>
+            a=${a}, b=${b}, c=${c}, d=${d}</p>
+            ${type === "RR" ? 
+                `<p><strong>Step 2: Calculate Risks</strong><br>
+                 Risk(Exp) = ${a}/(${a}+${b}) = ${round(riskExposed, 3)}<br>
+                 Risk(Unexp) = ${c}/(${c}+${d}) = ${round(riskUnexposed, 3)}<br>
+                 <strong>RR = ${round(riskExposed, 3)} / ${round(riskUnexposed, 3)} = ${rr}</strong></p>` : 
+                `<p><strong>Step 2: Calculate Odds Ratio</strong><br>
+                 OR = (a × d) / (b × c)<br>
+                 OR = (${a} × ${d}) / (${b} × ${c})<br>
+                 OR = ${a*d} / ${b*c} = <strong>${or}</strong></p>`
+            }`;
+
+        return { category: "Disease Association", text: questionText, correct: answer, options: opts, explanation: explanation };
+    }
+
+    // 2. Diagnostic Testing
+    function generateTestQuestion() {
+        const name = randItem(NAMES);
+        const disease = randItem(DISEASES);
+        
+        // TP, FP, FN, TN
+        let tp = randInt(50, 150);
+        let fn = randInt(5, 30);
+        let fp = randInt(20, 80);
+        let tn = randInt(100, 400);
+
+        const types = ["Sensitivity", "Specificity", "PPV", "NPV"];
+        const target = randItem(types);
+        
+        let ans, formulaStr, calcStr;
+        
+        if (target === "Sensitivity") {
+            ans = round((tp / (tp + fn)) * 100, 1) + "%";
+            formulaStr = "TP / (TP + FN)";
+            calcStr = `${tp} / ${tp+fn}`;
+        } else if (target === "Specificity") {
+            ans = round((tn / (tn + fp)) * 100, 1) + "%";
+            formulaStr = "TN / (TN + FP)";
+            calcStr = `${tn} / ${tn+fp}`;
+        } else if (target === "PPV") {
+            ans = round((tp / (tp + fp)) * 100, 1) + "%";
+            formulaStr = "TP / (TP + FP)";
+            calcStr = `${tp} / ${tp+fp}`;
+        } else {
+            ans = round((tn / (tn + fn)) * 100, 1) + "%";
+            formulaStr = "TN / (TN + FN)";
+            calcStr = `${tn} / ${tn+fn}`;
+        }
+
+        const questionText = `<strong>${name}</strong> evaluates a new test for "${disease}".
+            <br>
+            Data:
+            <ul>
+                <li>True Positives: ${tp}</li>
+                <li>False Negatives: ${fn}</li>
+                <li>False Positives: ${fp}</li>
+                <li>True Negatives: ${tn}</li>
+            </ul>
+            Calculate the <strong>${target}</strong>.`;
+
+        // Distractors
+        let opts = [];
+        // Add specific wrong answers based on common swaps
+        if(target === "Sensitivity") opts.push(round((tn/(tn+fp))*100,1)+"%"); // Spec
+        else opts.push(round((tp/(tp+fn))*100,1)+"%"); // Sens
+        
+        opts.push(round(Math.random()*100, 1)+"%");
+        opts.push(round(Math.random()*100, 1)+"%");
+
+        const table = `
+            <table class="calc-table">
+                <tr><th></th><th>Disease (+)</th><th>Healthy (-)</th></tr>
+                <tr><td>Test (+)</td><td>${tp} (TP)</td><td>${fp} (FP)</td></tr>
+                <tr><td>Test (-)</td><td>${fn} (FN)</td><td>${tn} (TN)</td></tr>
+            </table>`;
+
+        const explanation = `
+            ${table}
+            <p><strong>Formula for ${target}:</strong> ${formulaStr}</p>
+            <p><strong>Calculation:</strong><br>
+            = ${calcStr}<br>
+            = <strong>${ans}</strong></p>`;
+
+        return { category: "Diagnostic Testing", text: questionText, correct: ans, options: opts, explanation: explanation };
+    }
+
+    // 3. Vaccine Efficacy & Herd Immunity
+    function generateVaccineQuestion() {
+        const name = randItem(NAMES);
+        const disease = randItem(DISEASES);
+        const isHit = Math.random() > 0.6; // 40% HIT, 60% VE
+
+        if (isHit) {
+            // Herd Immunity
+            const r0 = randItem([2, 3, 4, 5, 6, 8, 10, 12, 15, 18]);
+            const hit = round((1 - (1/r0)) * 100, 1) + "%";
+            
+            const questionText = `<strong>${name}</strong> is studying a strain of "${disease}" with a basic reproduction number (R0) of <strong>${r0}</strong>.<br>
+            Calculate the Herd Immunity Threshold (HIT).`;
+
+            let opts = [
+                round((1 - (1/(r0+2))) * 100, 1) + "%",
+                round((1/r0) * 100, 1) + "%",
+                round((r0 * 10) + "%")
+            ];
+
+            const explanation = `
+                <p><strong>Formula:</strong> HIT = 1 - (1 / R0)</p>
+                <p><strong>Calculation:</strong><br>
+                HIT = 1 - (1 / ${r0})<br>
+                HIT = 1 - ${round(1/r0, 3)}<br>
+                HIT = <strong>${hit}</strong></p>`;
+            
+            return { category: "Herd Immunity", text: questionText, correct: hit, options: opts, explanation: explanation };
+
+        } else {
+            // Vaccine Efficacy
+            let totalVax = randInt(400, 1000);
+            let totalUnvax = randInt(400, 1000);
+            let casesVax = randInt(5, 50);
+            let casesUnvax = randInt(50, 200); // Make sure vaccine works somewhat
+
+            let arv = casesVax / totalVax;
+            let aru = casesUnvax / totalUnvax;
+            let ve = round(((aru - arv) / aru) * 100, 1) + "%";
+
+            const questionText = `<strong>${name}</strong> runs a vaccine trial for "${disease}".
+                <ul>
+                    <li>Vaccinated Group: ${casesVax} cases out of ${totalVax} people.</li>
+                    <li>Unvaccinated Group: ${casesUnvax} cases out of ${totalUnvax} people.</li>
+                </ul>
+                Calculate the Vaccine Efficacy (VE).`;
+
+            let opts = [
+                round(((arv - aru) / arv) * 100, 1) + "%", // wrong direction
+                round(aru * 100, 1) + "%",
+                round((casesUnvax - casesVax) / casesUnvax * 100, 1) + "%" // crude calc
+            ];
+
+            const explanation = `
+                <p><strong>Step 1: Attack Rates</strong><br>
+                AR(Unvax) = ${casesUnvax}/${totalUnvax} = ${round(aru, 4)}<br>
+                AR(Vax) = ${casesVax}/${totalVax} = ${round(arv, 4)}</p>
+                <p><strong>Step 2: Calculate VE</strong><br>
+                VE = (ARu - ARv) / ARu<br>
+                VE = (${round(aru,4)} - ${round(arv,4)}) / ${round(aru,4)}<br>
+                VE = <strong>${ve}</strong></p>`;
+
+            return { category: "Vaccine Efficacy", text: questionText, correct: ve, options: opts, explanation: explanation };
+        }
+    }
+
+    // 4. Likelihood Ratios
+    function generateLRQuestion() {
+        const name = randItem(NAMES);
+        const type = Math.random() > 0.5 ? "LR+" : "LR-";
+        
+        // Pick sens/spec that are nice
+        let sens = randItem([0.70, 0.75, 0.80, 0.85, 0.90, 0.95, 0.98, 0.99]);
+        let spec = randItem([0.70, 0.75, 0.80, 0.85, 0.90, 0.95, 0.98, 0.99]);
+
+        let ans;
+        let explanation;
+        
+        if (type === "LR+") {
+            ans = round(sens / (1 - spec));
+            explanation = `
+                <p><strong>Formula:</strong> LR+ = Sensitivity / (1 - Specificity)</p>
+                <p><strong>Calculation:</strong><br>
+                LR+ = ${sens} / (1 - ${spec})<br>
+                LR+ = ${sens} / ${round(1-spec, 2)}<br>
+                LR+ = <strong>${ans}</strong></p>`;
+        } else {
+            ans = round((1 - sens) / spec);
+            explanation = `
+                <p><strong>Formula:</strong> LR- = (1 - Sensitivity) / Specificity</p>
+                <p><strong>Calculation:</strong><br>
+                LR- = (1 - ${sens}) / ${spec}<br>
+                LR- = ${round(1-sens, 2)} / ${spec}<br>
+                LR- = <strong>${ans}</strong></p>`;
+        }
+
+        const questionText = `<strong>${name}</strong> evaluates a diagnostic test with:
+            <ul>
+                <li>Sensitivity: ${sens}</li>
+                <li>Specificity: ${spec}</li>
+            </ul>
+            Calculate the <strong>${type}</strong>.`;
+
+        let opts = [
+            round(ans * 2),
+            round(ans / 2),
+            round(ans + 1.5)
+        ];
+
+        return { category: "Likelihood Ratios", text: questionText, correct: ans, options: opts, explanation: explanation };
+    }
+
+    // --- MAIN INIT ---
+    function initQuiz() {
+        // Generate 25 of each category
+        for(let i=0; i<25; i++) questions.push(generateAssocQuestion());
+        for(let i=0; i<25; i++) questions.push(generateTestQuestion());
+        for(let i=0; i<25; i++) questions.push(generateVaccineQuestion());
+        for(let i=0; i<25; i++) questions.push(generateLRQuestion());
+        
+        // Shuffle the whole deck? Or keep categorical? 
+        // User asked for "10 problems in each category" previously, implies order. 
+        // Let's keep them in blocks but shuffle the blocks? 
+        // Actually, let's just keep them ordered by category for better practice flow, 
+        // or shuffle everything for a "real exam" feel. Let's shuffle.
+        questions.sort(() => Math.random() - 0.5);
+
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const q = questions[currentQuestionIndex];
+        
+        // Update UI
+        document.getElementById("progress-bar").style.width = ((currentQuestionIndex) / questions.length * 100) + "%";
+        document.getElementById("progress-text").innerText = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        
+        document.getElementById("category-display").innerText = q.category;
+        document.getElementById("question-text").innerHTML = q.text;
+        document.getElementById("feedback").style.display = "none";
+        document.getElementById("next-btn").style.display = "none";
+
+        // Mix options
+        let allOpts = [...q.options];
+        // Ensure the correct answer isn't always first in our logic, though generate functions usually separate them.
+        // Wait, the generate functions returned correct vs options. Need to combine.
+        if(!allOpts.includes(q.correct)) allOpts.push(q.correct);
+        
+        // Shuffle options
+        allOpts.sort(() => Math.random() - 0.5);
+
+        const container = document.getElementById("options-container");
+        container.innerHTML = "";
+        
+        allOpts.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(btn, opt, q);
+            container.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(btn, selectedVal, q) {
+        // Disable all buttons
+        const buttons = document.querySelectorAll(".option-btn");
+        buttons.forEach(b => b.disabled = true);
+
+        const isCorrect = (selectedVal === q.correct);
+        
+        if (isCorrect) {
+            btn.classList.add("correct");
+            document.getElementById("feedback").className = "feedback-box success";
+            document.getElementById("feedback-title").innerText = "✅ Correct!";
+            score++;
+        } else {
+            btn.classList.add("wrong");
+            document.getElementById("feedback").className = "feedback-box error";
+            document.getElementById("feedback-title").innerText = "❌ Incorrect";
+            
+            // Highlight correct one
+            buttons.forEach(b => {
+                if (b.innerText == q.correct) b.classList.add("correct");
+            });
+        }
+
+        document.getElementById("feedback-body").innerHTML = q.explanation;
+        document.getElementById("feedback").style.display = "block";
+        document.getElementById("next-btn").style.display = "inline-block";
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.length) {
+            renderQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById("quiz-content").style.display = "none";
+        document.getElementById("results-screen").style.display = "block";
+        document.getElementById("final-score").innerText = `${score} / 100`;
+        document.getElementById("progress-bar").style.width = "100%";
+    }
+
+    // Start
+    initQuiz();
+
+</script>
+
+</body>
+</html>
